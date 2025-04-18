@@ -34,15 +34,23 @@ namespace SelbsttestPraktikum
 
             if (totalHours >= 500 && usesTools && stipendLimit)
             {
-                result = $"👏 {name}, du hast {totalHours} Stunden gesammelt, verwendest relevante Tools und liegst an der Zuverdienstgrenze. → Eine Anrechnung ist sinnvoll.";
+                result = $"{name}, du hast {totalHours} Stunden gesammelt (über 500), verwendest relevante Tools und liegst an der Zuverdienstgrenze. → Eine Anrechnung des Pflichtpraktikums ist sinnvoll.";
+            }
+            else if (totalHours >= 500 && usesTools && !stipendLimit)
+            {
+                result = $"{name}, du hast {totalHours} Stunden gesammelt (über 500) und verwendest bereits relevante Tools. → Eine Anrechnung des Pflichtpraktikums ist sinnvoll.";
+            }
+            else if (totalHours >= 500 && !usesTools)
+            {
+                result = $"{name}, du hast {totalHours} Stunden gesammelt (über 500) aber du verwendest keine relevanten Tools. → Eine Absolvierung des Pflichtpraktikums ist sinnvoll.";
             }
             else if (totalHours < 500)
             {
-                result = $"📉 {name}, du hast nur {totalHours} Stunden gesammelt – für eine Anrechnung brauchst du mindestens 500.";
+                result = $"{name}, du hast nur {totalHours} Stunden gesammelt – für eine Anrechnung brauchst du mindestens 500.";
             }
             else
             {
-                result = $"ℹ️ {name}, deine Angaben zeigen, dass du eventuell noch etwas sammeln oder genauer prüfen solltest.";
+                result = $"{name}, bitte prüfe noch einmal deine Angabe und starte den Test erneut.";
             }
 
             ResultText.Text = result;
@@ -50,6 +58,11 @@ namespace SelbsttestPraktikum
 
             // Ergebnis optional speichern (lokal als CSV)
             SaveResultAsCsv(name, totalHours, usesTools, stipendLimit, result);
+
+            EvaluateButton.Visibility = Visibility.Collapsed;
+            ResetButton.Visibility = Visibility.Visible;
+
+
         }
 
         private void SaveResultAsCsv(string name, int totalHours, bool usesTools, bool stipendLimit, string result)
@@ -73,6 +86,28 @@ namespace SelbsttestPraktikum
             {
                 MessageBox.Show($"Fehler beim Speichern: {ex.Message}");
             }
+     
         }
+
+
+        private void Reset_Click(object sender, RoutedEventArgs e)
+        {
+            NameBox.Text = "";
+            YearsBox.Text = "";
+            MonthsBox.Text = "";
+            HoursPerWeekBox.Text = "";
+            ToolsYes.IsChecked = false;
+            ToolsNo.IsChecked = false;
+            StipendiumYes.IsChecked = false;
+            StipendiumNo.IsChecked = false;
+
+            ResultText.Text = "";
+            ResultText.Visibility = Visibility.Collapsed;
+            ResetButton.Visibility = Visibility.Collapsed;
+
+            EvaluateButton.Visibility = Visibility.Visible;
+
+        }
+
     }
 }

@@ -116,9 +116,10 @@
 
             <!-- Button + Ergebnis -->
             <StackPanel Grid.Row="2" VerticalAlignment="Bottom">
-                <Button Style="{StaticResource RoundedYellowButton}"
-                        Content="🔍 Test auswerten"
-                        Click="Evaluate_Click"/>
+                <Button x:Name="EvaluateButton"
+        Style="{StaticResource RoundedYellowButton}"
+        Content="🔍 Test auswerten"
+        Click="Evaluate_Click"/>
                 <TextBlock x:Name="ResultText"
                            Text=""
                            Foreground="#1f2e5a"
@@ -127,6 +128,14 @@
                            TextAlignment="Center"
                            Visibility="Collapsed"
                            FontSize="14"/>
+
+                <Button Content="🔄 Test zurücksetzen"
+        Style="{StaticResource RoundedYellowButton}"
+        Click="Reset_Click"
+        Visibility="Collapsed"
+        x:Name="ResetButton"/>
+
+
             </StackPanel>
         </Grid>
     </Border>
