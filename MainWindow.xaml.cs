@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows;
 using System.IO;
-using Microsoft.Data.SqlClient;
+using System.Data.SqlClient;
 
 namespace SelbsttestPraktikum
 {
@@ -67,11 +67,14 @@ namespace SelbsttestPraktikum
         }
 
 
+
         private void SaveResultToDatabase(string name, int totalHours, bool usesTools, bool stipendLimit, string result)
         {
-            string connectionString = "Server=localhost\\SQLEXPRESS;Database=SelbsttestDB;Trusted_Connection=True;";
-            string query = "INSERT INTO Ergebnisse (Name, Gesamtstunden, ToolsVerwendet, StipendiumRelevant, Ergebnistext) " +
-                           "VALUES (@Name, @Stunden, @Tools, @Stipendium, @Ergebnis);";
+            string connectionString = "Server=DESKTOP-EO8RV28\\SQLEXPRESS;Database=SelbsttestDB;Trusted_Connection=True;TrustServerCertificate=True;";
+
+            string query = @"
+        INSERT INTO Ergebnisse (Name, Gesamtstunden, VerwendetTools, AnZuverdienstgrenze, Ergebnistext)
+        VALUES (@Name, @Stunden, @Tools, @Stipendium, @Ergebnis);";
 
             try
             {
@@ -90,7 +93,7 @@ namespace SelbsttestPraktikum
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Fehler beim Speichern in die Datenbank: {ex.Message}");
+                MessageBox.Show($"❌ Fehler beim Speichern in die Datenbank:\n{ex.Message}", "Fehler", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
