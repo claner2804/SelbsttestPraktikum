@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows;
 using System.IO;
-using System.Data.SqlClient;
+using Npgsql;
 
 namespace SelbsttestPraktikum
 {
@@ -70,17 +70,18 @@ namespace SelbsttestPraktikum
 
         private void SaveResultToDatabase(string name, int totalHours, bool usesTools, bool stipendLimit, string result)
         {
-            string connectionString = "Server=DESKTOP-EO8RV28\\SQLEXPRESS;Database=SelbsttestDB;Trusted_Connection=True;TrustServerCertificate=True;";
+            string connectionString = "Host=gondola.proxy.rlwy.net;Port=57980;Username=postgres;Password=WhVtLzEAnkYeHErdZqigXyIGOxpHBSZg;Database=railway;SSL Mode=Require;Trust Server Certificate=true";
 
             string query = @"
-        INSERT INTO Ergebnisse (Name, Gesamtstunden, VerwendetTools, AnZuverdienstgrenze, Ergebnistext)
-        VALUES (@Name, @Stunden, @Tools, @Stipendium, @Ergebnis);";
+        INSERT INTO Ergebnisse (Timestamp, Name, Gesamtstunden, VerwendetTools, AnZuverdienstgrenze, Ergebnistest)
+        VALUES (@Timestamp, @Name, @Stunden, @Tools, @Stipendium, @Ergebnis);";
 
             try
             {
-                using (SqlConnection conn = new SqlConnection(connectionString))
-                using (SqlCommand cmd = new SqlCommand(query, conn))
+                using (var conn = new NpgsqlConnection(connectionString))
+                using (var cmd = new NpgsqlCommand(query, conn))
                 {
+                    cmd.Parameters.AddWithValue("@Timestamp", DateTime.Now);
                     cmd.Parameters.AddWithValue("@Name", name);
                     cmd.Parameters.AddWithValue("@Stunden", totalHours);
                     cmd.Parameters.AddWithValue("@Tools", usesTools);
