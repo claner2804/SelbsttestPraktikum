@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows;
 using System.IO;
+using Microsoft.Data.SqlClient;
 
 namespace SelbsttestPraktikum
 {
@@ -56,8 +57,8 @@ namespace SelbsttestPraktikum
             ResultText.Text = result;
             ResultText.Visibility = Visibility.Visible;
 
-            // Ergebnis optional speichern (lokal als CSV)
-            SaveResultAsCsv(name, totalHours, usesTools, stipendLimit, result);
+            // Ergebnis in datenbank speichern 
+            SaveResultToDatabase(name, totalHours, usesTools, stipendLimit, result);
 
             EvaluateButton.Visibility = Visibility.Collapsed;
             ResetButton.Visibility = Visibility.Visible;
@@ -65,29 +66,34 @@ namespace SelbsttestPraktikum
 
         }
 
-        private void SaveResultAsCsv(string name, int totalHours, bool usesTools, bool stipendLimit, string result)
+
+        private void SaveResultToDatabase(string name, int totalHours, bool usesTools, bool stipendLimit, string result)
         {
-            string filePath = "test_results.csv";
-            string line = $"\"{DateTime.Now}\",\"{name}\",{totalHours},{usesTools},{stipendLimit},\"{result}\"";
+            string connectionString = "Server=localhost\\SQLEXPRESS;Database=SelbsttestDB;Trusted_Connection=True;";
+            string query = "INSERT INTO Ergebnisse (Name, Gesamtstunden, ToolsVerwendet, StipendiumRelevant, Ergebnistext) " +
+                           "VALUES (@Name, @Stunden, @Tools, @Stipendium, @Ergebnis);";
 
             try
             {
-                bool newFile = !File.Exists(filePath);
-                using (StreamWriter writer = new StreamWriter(filePath, true))
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
-                    if (newFile)
-                    {
-                        writer.WriteLine("Timestamp,Name,Gesamtstunden,Tools,Stipendium,Ergebnis");
-                    }
-                    writer.WriteLine(line);
+                    cmd.Parameters.AddWithValue("@Name", name);
+                    cmd.Parameters.AddWithValue("@Stunden", totalHours);
+                    cmd.Parameters.AddWithValue("@Tools", usesTools);
+                    cmd.Parameters.AddWithValue("@Stipendium", stipendLimit);
+                    cmd.Parameters.AddWithValue("@Ergebnis", result);
+
+                    conn.Open();
+                    cmd.ExecuteNonQuery();
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Fehler beim Speichern: {ex.Message}");
+                MessageBox.Show($"Fehler beim Speichern in die Datenbank: {ex.Message}");
             }
-     
         }
+
 
 
         private void Reset_Click(object sender, RoutedEventArgs e)
